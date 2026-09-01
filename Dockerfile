@@ -1,5 +1,3 @@
-FROM eclipse-temurin:21-jdk
+FROM mcr.microsoft.com/devcontainers/java:21-bookworm
 
 WORKDIR /workspace
-
-CMD ["sleep", "infinity"]
