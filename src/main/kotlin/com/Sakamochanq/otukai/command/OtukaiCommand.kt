@@ -4,10 +4,11 @@ import com.Sakamochanq.otukai.OtukaiPlugin
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.command.TabCompleter
 
 class OtukaiCommand(
     private val plugin: OtukaiPlugin
-) : CommandExecutor {
+) : CommandExecutor, TabCompleter {
 
     override fun onCommand(
         sender: CommandSender,
@@ -47,5 +48,20 @@ class OtukaiCommand(
         }
 
         return true
+    }
+
+    override fun onTabComplete(
+        sender: CommandSender,
+        command: Command,
+        alias: String,
+        args: Array<out String>
+    ): List<String> {
+
+        if (args.size == 1) {
+            return listOf("start", "stop")
+                .filter { it.startsWith(args[0], ignoreCase = true) }
+        }
+
+        return emptyList()
     }
 }

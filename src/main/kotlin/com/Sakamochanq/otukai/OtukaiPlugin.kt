@@ -21,9 +21,10 @@ class OtukaiPlugin : JavaPlugin() {
             gameManager
         )
 
-        getCommand("otukai")?.setExecutor(
-            OtukaiCommand(this)
-        )
+        val otukaiCommand = OtukaiCommand(this)
+
+        getCommand("otukai")?.setExecutor(otukaiCommand)
+        getCommand("otukai")?.tabCompleter = otukaiCommand
 
         gameScheduler.start()
 
