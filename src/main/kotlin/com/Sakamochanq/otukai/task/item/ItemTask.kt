@@ -6,12 +6,13 @@ import kotlin.time.Duration
 
 data class ItemTask(
     val item: Material,
+    val displayName: String,
     val amount: Int,
     override val timeLimit: Duration
 ) : Task {
 
     override val description: String
-        get() = "${item.name}を${amount}個手に入れろ！"
+        get() = "${displayName}を${amount}個手に入れろ！"
 
     override fun isCompleted(progress: Int): Boolean {
         return progress >= amount

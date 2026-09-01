@@ -9,11 +9,13 @@ object TaskList {
     val tasks: List<Task> = listOf(
         ItemTask(
             item = Material.APPLE,
+            displayName = "りんご",
             amount = 1,
             timeLimit = 5.minutes
         ),
         ItemTask(
             item = Material.COBBLESTONE,
+            displayName = "丸石",
             amount = 32,
             timeLimit = 3.minutes
         )
