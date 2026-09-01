@@ -25,6 +25,7 @@ services:
 
     volumes:
       - ./server:/data
+      - ./build/libs:/data/plugins
 
     stdin_open: true
     tty: true
