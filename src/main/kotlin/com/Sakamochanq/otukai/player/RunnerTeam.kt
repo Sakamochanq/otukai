@@ -1,6 +1,7 @@
 package com.Sakamochanq.otukai.player
 
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.scoreboard.Team
 
@@ -21,6 +22,7 @@ class RunnerTeam {
             ?: scoreboard.registerNewTeam(TEAM_NAME)
 
         team.prefix = TEAM_PREFIX
+        team.color = ChatColor.AQUA
     }
 
     // [runner]チームにプレイヤーを追加する
@@ -28,12 +30,10 @@ class RunnerTeam {
         team.addPlayer(player)
     }
 
-
     // [runner]チームからプレイヤーを削除する
     fun removePlayer(player: Player) {
         team.removePlayer(player)
     }
-
 
     // [runner]チームのクリア
     fun clear() {
@@ -41,7 +41,6 @@ class RunnerTeam {
             team.removeEntry(it)
         }
     }
-
 
     // [runner]チームに所属しているプレイヤーを取得する
     fun getPlayers(): Set<Player> {
