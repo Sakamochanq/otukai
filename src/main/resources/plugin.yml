@@ -1,4 +1,9 @@
 name: Otukai
 version: 0.1.0
-main: com.sakamochanq.otukai.OtukaiPlugin
-api-version: '1.21.10'
+main: com.Sakamochanq.otukai.OtukaiPlugin
+api-version: '1.21'
+
+commands:
+  otukai:
+    description: おつかいゲームを操作します
+    usage: /otukai <start|stop>
