@@ -2,9 +2,11 @@ package com.Sakamochanq.otukai.game
 
 import com.Sakamochanq.otukai.task.Task
 import com.Sakamochanq.otukai.task.TaskSession
+import org.bukkit.entity.Player
 import kotlin.time.Duration
 
 class Game(
+    val players: Set<Player>,
     val tasks: List<Task>
 ) {
 
@@ -17,10 +19,13 @@ class Game(
     var currentTask: TaskSession? = null
         private set
 
-    // ゲーム開始
     fun start() {
         check(state == GameState.IDLE) {
             "Game is already started."
+        }
+
+        check(players.isNotEmpty()) {
+            "Cannot start a game without players."
         }
 
         check(tasks.isNotEmpty()) {
@@ -33,7 +38,6 @@ class Game(
         startCurrentTask()
     }
 
-    // 進捗の追加
     fun addProgress(amount: Int) {
         check(state == GameState.PLAYING) {
             "Game is not playing."
@@ -49,7 +53,6 @@ class Game(
         }
     }
 
-    // 経過時間の反映
     fun tick(elapsed: Duration) {
         if (state != GameState.PLAYING) {
             return
@@ -64,7 +67,6 @@ class Game(
         }
     }
 
-    // 強制終了
     fun stop() {
         if (state != GameState.PLAYING) {
             return
@@ -73,7 +75,6 @@ class Game(
         finish()
     }
 
-    // 現在のタスクを開始する
     private fun startCurrentTask() {
         val task = tasks.getOrNull(currentTaskIndex)
 
@@ -85,13 +86,11 @@ class Game(
         currentTask = TaskSession(task)
     }
 
-    // 次のタスクへ
     private fun nextTask() {
         currentTaskIndex++
         startCurrentTask()
     }
 
-    // ゲーム終了
     private fun finish() {
         state = GameState.FINISHED
         currentTask = null

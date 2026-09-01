@@ -1,11 +1,16 @@
 package com.Sakamochanq.otukai.game
 
 import com.Sakamochanq.otukai.task.TaskList
+import com.Sakamochanq.otukai.player.RunnerTeam
+import com.Sakamochanq.otukai.ui.GameBossBar
 import kotlin.time.Duration
+import org.bukkit.Bukkit
 
 class GameManager {
 
     private var game: Game? = null
+    private val runnerTeam = RunnerTeam()
+    private val bossBar = GameBossBar()
 
     // ゲームが進行中かどうか
     val isRunning: Boolean
@@ -24,11 +29,26 @@ class GameManager {
             return false
         }
 
-        val newGame = Game(TaskList.tasks)
+        runnerTeam.clear()
+
+        val players = Bukkit.getOnlinePlayers().toSet()
+
+        players.forEach {
+            runnerTeam.addPlayer(it)
+        }
+
+        val newGame = Game(
+            players = players,
+            tasks = TaskList.tasks
+        )
 
         newGame.start()
 
         game = newGame
+
+        bossBar.setPlayers(players)
+        bossBar.update(newGame)
+        bossBar.show()
 
         return true
     }
@@ -44,16 +64,33 @@ class GameManager {
 
         currentGame.stop()
 
+        bossBar.hide()
+        bossBar.removeAll()
+
+        runnerTeam.clear()
+
         return true
     }
 
 
     // 経過時間の反映
     fun tick(elapsed: Duration) {
-        game?.tick(elapsed)
-
-        if (game?.state == GameState.FINISHED) {
+        val currentGame = game
+            ?: return
+        
+        currentGame.tick(elapsed)
+        
+        if (currentGame.state == GameState.FINISHED) {
+            bossBar.hide()
+            bossBar.removeAll()
+        
+            runnerTeam.clear()
+        
             game = null
+        
+            return
         }
+    
+        bossBar.update(currentGame)
     }
 }

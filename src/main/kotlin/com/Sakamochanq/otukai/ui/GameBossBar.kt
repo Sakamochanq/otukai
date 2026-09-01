@@ -17,6 +17,14 @@ class GameBossBar {
         BarStyle.SOLID
     )
 
+    fun setPlayers(players: Set<Player>) {
+        bossBar.removeAll()
+
+        players.forEach { player ->
+            bossBar.addPlayer(player)
+        }
+    }
+
     fun addPlayer(player: Player) {
         bossBar.addPlayer(player)
     }
