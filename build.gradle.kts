@@ -17,17 +17,15 @@ dependencies {
 
 kotlin {
     jvmToolchain(21)
+
+    compilerOptions {
+        jvmTarget.set(
+            org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+        )
+    }
 }
 
 tasks {
-    compileKotlin {
-        compilerOptions {
-            jvmTarget.set(
-                org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
-            )
-        }
-    }
-
     jar {
         archiveBaseName.set("otukai")
     }
