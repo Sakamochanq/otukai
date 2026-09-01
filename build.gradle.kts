@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
+    implementation(kotlin("stdlib"))
 }
 
 kotlin {
@@ -26,7 +27,21 @@ kotlin {
 }
 
 tasks {
+    compileKotlin {
+        compilerOptions {
+            jvmTarget.set(
+                org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+            )
+        }
+    }
+
     jar {
         archiveBaseName.set("otukai")
+
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+        from(configurations.runtimeClasspath.get().map {
+            if (it.isDirectory) it else zipTree(it)
+        })
     }
 }
