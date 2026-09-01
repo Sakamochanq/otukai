@@ -1,0 +1,30 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    volumes:
+      - .:/workspace
+
+    working_dir: /workspace
+
+    stdin_open: true
+    tty: true
+
+  minecraft:
+    image: itzg/minecraft-server:java21
+
+    environment:
+      EULA: "TRUE"
+      TYPE: "PAPER"
+      VERSION: "1.21.10"
+
+    ports:
+      - "25565:25565"
+
+    volumes:
+      - ./server:/data
+
+    stdin_open: true
+    tty: true
