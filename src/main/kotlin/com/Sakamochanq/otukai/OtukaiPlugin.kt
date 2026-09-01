@@ -1,6 +1,7 @@
 package com.Sakamochanq.otukai
 
 import com.Sakamochanq.otukai.command.OtukaiCommand
+import com.Sakamochanq.otukai.listener.TaskProgressListener
 import com.Sakamochanq.otukai.game.GameManager
 import com.Sakamochanq.otukai.game.GameScheduler
 import org.bukkit.plugin.java.JavaPlugin
@@ -25,7 +26,11 @@ class OtukaiPlugin : JavaPlugin() {
 
         getCommand("otukai")?.setExecutor(otukaiCommand)
         getCommand("otukai")?.tabCompleter = otukaiCommand
-
+        
+        server.pluginManager.registerEvents(
+            TaskProgressListener(this),
+            this
+        )
         gameScheduler.start()
 
         logger.info("Otukai plugin enabled!")
