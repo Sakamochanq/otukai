@@ -139,10 +139,10 @@ class GameManager {
                 task = task
             )
 
-            session.updateItemProgress(
-                player = player,
-                currentAmount = currentAmount
-            )
+            // session.updateItemProgress(
+            //     player = player,
+            //     currentAmount = currentAmount
+            // )
         }
 
         // Scoreboardを更新

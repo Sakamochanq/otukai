@@ -38,6 +38,9 @@ class TaskSession(
         }
 
         initialItemCounts[player] = amount
+
+        // 新しいタスク開始時なので、進捗を0にする
+        playerProgress[player] = 0
     }
 
     // ゲーム開始時の所持数を取得
