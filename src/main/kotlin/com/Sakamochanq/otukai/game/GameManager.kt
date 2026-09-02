@@ -252,17 +252,25 @@ class GameManager {
         val currentGame = game ?: return
         if (currentGame.state != GameState.PLAYING) return
         if (!currentGame.players.contains(player)) return
-
+        
         val session = currentGame.currentTask ?: return
         session.task as? UseItemTask ?: return
-
+        
         session.addProgress(
             player = player,
             amount = 1
         )
-
+        
+        // 進捗が実際に増えたときだけ効果音を鳴らす
+        player.playSound(
+            player.location,
+            Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
+            0.6f,
+            1.2f
+        )
+        
         scoreboard.show(currentGame)
-
+        
         if (session.isCompleted && currentGame.checkTaskCompleted()) {
             announceTaskCompleted()
         }
