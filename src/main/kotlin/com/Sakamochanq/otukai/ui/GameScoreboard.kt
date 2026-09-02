@@ -1,6 +1,8 @@
 package com.Sakamochanq.otukai.ui
 
 import com.Sakamochanq.otukai.game.Game
+import com.Sakamochanq.otukai.task.item.ItemTask
+import com.Sakamochanq.otukai.task.kill.KillTask
 import org.bukkit.Bukkit
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Objective
@@ -14,34 +16,96 @@ class GameScoreboard {
 
     companion object {
         private const val OBJECTIVE_NAME = "otukai_task"
-        private const val OBJECTIVE_TITLE = "§e§lおつかい！"
+        private const val OBJECTIVE_TITLE = "§eタスク進捗"
     }
 
     private var objective: Objective? = null
+
+    // 現在表示しているエントリー
+    private val entries = mutableSetOf<String>()
 
     fun show(game: Game) {
         val currentObjective = getOrCreateObjective()
 
         currentObjective.displaySlot = DisplaySlot.SIDEBAR
 
-        clear(currentObjective)
+        clear()
 
         val session = game.currentTask
             ?: return
+
+        val task = session.task
+
+        // タスクのノルマ
+        val targetAmount = when (task) {
+            is ItemTask -> task.amount
+            is KillTask -> task.amount
+            else -> 0
+        }
+
+        // タスクの単位
+        val unit = when (task) {
+            is ItemTask -> "個"
+            is KillTask -> "匹"
+            else -> ""
+        }
+
+        val displayEntries = mutableListOf<String>()
+
+        // 空白
+        displayEntries.add("§0 ")
+
+        // タスク内容
+        displayEntries.add(
+            "§f${task.description}"
+        )
+
+        // 空白
+        displayEntries.add("§0  ")
 
         // プレイヤーごとの進捗
         game.players
             .sortedBy { it.name.lowercase() }
             .forEach { player ->
-                currentObjective
-                    .getScore(player.name)
-                    .score = session.getProgress(player)
+
+                displayEntries.add(
+                    createPlayerEntry(
+                        playerName = player.name,
+                        progress = session.getProgress(player),
+                        unit = unit
+                    )
+                )
             }
 
+        // 空白
+        displayEntries.add("§0   ")
+
         // 合計
-        currentObjective
-            .getScore("§e合計")
-            .score = session.progress
+        displayEntries.add(
+            createTotalEntry(
+                progress = session.progress,
+                target = targetAmount,
+                unit = unit
+            )
+        )
+
+        /*
+         * スコアは表示順を決めるためだけに使用する。
+         *
+         * 実際の進捗は文字列の中に表示する。
+         */
+        val maxScore = displayEntries.size
+
+        displayEntries.forEachIndexed { index, entry ->
+
+            val score = maxScore - index
+
+            currentObjective
+                .getScore(entry)
+                .score = score
+
+            entries.add(entry)
+        }
     }
 
     fun hide() {
@@ -49,11 +113,11 @@ class GameScoreboard {
     }
 
     fun remove() {
-        objective?.let {
-            scoreboard.resetScores(it.name)
-        }
+        clear()
 
-        val existing = scoreboard.getObjective(OBJECTIVE_NAME)
+        val existing = scoreboard.getObjective(
+            OBJECTIVE_NAME
+        )
 
         if (existing != null) {
             existing.unregister()
@@ -63,7 +127,9 @@ class GameScoreboard {
     }
 
     private fun getOrCreateObjective(): Objective {
-        val existing = scoreboard.getObjective(OBJECTIVE_NAME)
+        val existing = scoreboard.getObjective(
+            OBJECTIVE_NAME
+        )
 
         if (existing != null) {
             objective = existing
@@ -81,11 +147,29 @@ class GameScoreboard {
         return newObjective
     }
 
-    private fun clear(objective: Objective) {
-        scoreboard.entries
+    private fun createPlayerEntry(
+        playerName: String,
+        progress: Int,
+        unit: String
+    ): String {
+        return "§f$playerName §7» §a${progress}${unit}"
+    }
+
+    private fun createTotalEntry(
+        progress: Int,
+        target: Int,
+        unit: String
+    ): String {
+        return "§e合計 §7» §a${progress}/${target}${unit}"
+    }
+
+    private fun clear() {
+        entries
             .toList()
             .forEach { entry ->
                 scoreboard.resetScores(entry)
             }
+
+        entries.clear()
     }
 }

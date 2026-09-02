@@ -53,11 +53,12 @@ class GameBossBar {
         )
 
         bossBar.setTitle(
-            buildString {
-                append(task.description)
-                append("  ")
-                append(formatTime(remaining))
-            }
+            formatTime(remaining)
+            // buildString {
+            //     append(task.description)
+            //     append("  ")
+            //     append(formatTime(remaining))
+            // }
         )
     }
 
