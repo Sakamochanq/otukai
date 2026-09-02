@@ -2,14 +2,15 @@ package com.Sakamochanq.otukai.game
 
 import com.Sakamochanq.otukai.task.Task
 import com.Sakamochanq.otukai.task.TaskSession
-import org.bukkit.entity.Player
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class Game(
-    val players: Set<Player>,
-    val tasks: List<Task>
+    val players: Set<org.bukkit.entity.Player>,
+    tasks: List<Task>
 ) {
+    // ゲーム開始時にタスクをランダムな順番にする
+    private val shuffledTasks = tasks.shuffled()
 
     companion object {
         private val INTERMISSION_DURATION = 5.seconds
@@ -36,31 +37,27 @@ class Game(
             "Cannot start a game without players."
         }
 
-        check(tasks.isNotEmpty()) {
+        check(shuffledTasks.isNotEmpty()) {
             "Cannot start a game without tasks."
         }
 
         state = GameState.PLAYING
         currentTaskIndex = 0
-
         startCurrentTask()
     }
 
-    // 現在のタスクが達成されていたら次のタスクへの待機状態にする
     fun checkTaskCompleted(): Boolean {
         if (state != GameState.PLAYING) {
             return false
         }
 
-        val session = currentTask
-            ?: return false
+        val session = currentTask ?: return false
 
         if (!session.isCompleted) {
             return false
         }
 
         startIntermission()
-
         return true
     }
 
@@ -84,8 +81,7 @@ class Game(
     }
 
     private fun tickPlaying(elapsed: Duration) {
-        val session = currentTask
-            ?: return
+        val session = currentTask ?: return
 
         session.tick(elapsed)
 
@@ -102,7 +98,7 @@ class Game(
         if (intermissionRemaining == Duration.ZERO) {
             currentTaskIndex++
 
-            if (currentTaskIndex >= tasks.size) {
+            if (currentTaskIndex >= shuffledTasks.size) {
                 finish()
             } else {
                 startCurrentTask()
@@ -112,7 +108,7 @@ class Game(
     }
 
     private fun startCurrentTask() {
-        val task = tasks.getOrNull(currentTaskIndex)
+        val task = shuffledTasks.getOrNull(currentTaskIndex)
 
         if (task == null) {
             finish()
