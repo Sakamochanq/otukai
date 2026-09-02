@@ -2,14 +2,14 @@ package com.Sakamochanq.otukai.game
 
 import com.Sakamochanq.otukai.player.RunnerTeam
 import com.Sakamochanq.otukai.task.TaskList
-import com.Sakamochanq.otukai.ui.GameBossBar
 import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
+import com.Sakamochanq.otukai.ui.GameBossBar
+import com.Sakamochanq.otukai.ui.GameScoreboard
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 class GameManager {
 
@@ -17,6 +17,7 @@ class GameManager {
 
     private val runnerTeam = RunnerTeam()
     private val bossBar = GameBossBar()
+    private val scoreboard = GameScoreboard()
 
     private var lastIntermissionSecond: Int? = null
 
@@ -55,9 +56,14 @@ class GameManager {
         game = newGame
         lastIntermissionSecond = null
 
+        // 最初のタスクの初期インベントリを記録
+        initializeItemTaskProgress(newGame)
+
         bossBar.setPlayers(players)
         bossBar.update(newGame)
         bossBar.show()
+
+        scoreboard.show(newGame)
 
         announceTaskStarted(newGame)
 
@@ -76,38 +82,79 @@ class GameManager {
         return true
     }
 
-    fun addProgress(
-        player: Player,
-        amount: Int
-    ) {
-        val currentGame = game
+    // アイテムタスク開始時の基準値を記録する
+    private fun initializeItemTaskProgress(game: Game) {
+        val session = game.currentTask
             ?: return
 
-        if (currentGame.state != GameState.PLAYING) {
+        val task = session.task as? ItemTask
+            ?: return
+
+        game.players.forEach { player ->
+            val currentAmount = countItem(
+                player = player,
+                task = task
+            )
+
+            session.setInitialItemCount(
+                player = player,
+                amount = currentAmount
+            )
+
+            session.updateItemProgress(
+                player = player,
+                currentAmount = currentAmount
+            )
+        }
+    }
+
+    // インベントリ内の対象アイテム数を数える
+    private fun countItem(
+        player: Player,
+        task: ItemTask
+    ): Int {
+        return player.inventory.contents
+            .filterNotNull()
+            .filter { it.type == task.item }
+            .sumOf { it.amount }
+    }
+
+    // アイテムタスクの現在の進捗を更新する
+    private fun updateItemTaskProgress(game: Game) {
+        if (game.state != GameState.PLAYING) {
             return
         }
 
-        val session = currentGame.currentTask
+        val session = game.currentTask
             ?: return
 
-        val task = session.task
+        val task = session.task as? ItemTask
+            ?: return
 
-        val completed = currentGame.addProgress(amount)
+        val completedBefore = session.isCompleted
 
-        val message = when (task) {
-            is ItemTask -> task.pickupMessage(player.name, amount)
-            else -> "${player.name}がアイテムをゲットした！"
+        game.players.forEach { player ->
+            val currentAmount = countItem(
+                player = player,
+                task = task
+            )
+
+            session.updateItemProgress(
+                player = player,
+                currentAmount = currentAmount
+            )
         }
 
-    Bukkit.getOnlinePlayers().forEach {
-        it.sendMessage("§b$message")
-    }
+        // Scoreboardを更新
+        scoreboard.show(game)
 
-        if (completed) {
+        // タスク達成
+        if (session.isCompleted && game.checkTaskCompleted()) {
             announceTaskCompleted()
         }
     }
 
+    // キル系タスクの進捗を追加
     fun addKillProgress(player: Player) {
         val currentGame = game
             ?: return
@@ -119,18 +166,21 @@ class GameManager {
         val session = currentGame.currentTask
             ?: return
 
-        val task = session.task as? KillTask
+        session.task as? KillTask
             ?: return
 
-        val completed = currentGame.addProgress(1)
+        val completedBefore = session.isCompleted
 
-        Bukkit.getOnlinePlayers().forEach {
-            it.sendMessage(
-                "§b${task.killMessage(player.name)}"
-            )
-        }
+        session.addProgress(
+            player = player,
+            amount = 1
+        )
 
-        if (completed) {
+        // Scoreboardを更新
+        scoreboard.show(currentGame)
+
+        // タスク達成
+        if (session.isCompleted && currentGame.checkTaskCompleted()) {
             announceTaskCompleted()
         }
     }
@@ -146,14 +196,25 @@ class GameManager {
 
         when (currentGame.state) {
             GameState.PLAYING -> {
+
+                // アイテムタスクの進捗を更新
+                updateItemTaskProgress(currentGame)
+
+                // インターミッション終了後、
+                // 新しいタスクが開始された
                 if (
                     previousState == GameState.INTERMISSION ||
                     previousTaskIndex != currentGame.currentTaskIndex
                 ) {
                     lastIntermissionSecond = null
 
+                    // 新しいタスクの初期インベントリを記録
+                    initializeItemTaskProgress(currentGame)
+
                     bossBar.update(currentGame)
                     bossBar.show()
+
+                    scoreboard.show(currentGame)
 
                     announceTaskStarted(currentGame)
                 } else {
@@ -185,52 +246,98 @@ class GameManager {
         }
     }
 
-    // おつかい開始のアナウンスを全員に送信する
+    // おつかい開始のアナウンス
     private fun announceTaskStarted(game: Game) {
         val session = game.currentTask
             ?: return
 
         Bukkit.getOnlinePlayers().forEach { player ->
-            player.sendTitle("§e§lおつかい！", "§f${session.task.description}", 10, 50, 10)
+            player.sendTitle(
+                "§e§lおつかい！",
+                "§f${session.task.description}",
+                10,
+                50,
+                10
+            )
 
-            player.sendMessage("§e§lおつかい！ §f${session.task.description}")
+            player.sendMessage(
+                "§e§lおつかい！ §f${session.task.description}"
+            )
 
-            player.playSound(player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f)
+            player.playSound(
+                player.location,
+                Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
+                1.0f,
+                1.0f
+            )
         }
     }
 
     // おつかい完了
     private fun announceTaskCompleted() {
         Bukkit.getOnlinePlayers().forEach { player ->
-            player.sendTitle("§a§lタスク達成！", "§f次のタスクへ！", 5, 30, 10)
-            player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_BELL, 1.0f, 1.0f)
+            player.sendTitle(
+                "§a§lタスク達成！",
+                "§f次のタスクへ！",
+                5,
+                30,
+                10
+            )
+
+            player.playSound(
+                player.location,
+                Sound.BLOCK_NOTE_BLOCK_BELL,
+                1.0f,
+                1.0f
+            )
         }
 
         announceIntermission(5)
         lastIntermissionSecond = 5
     }
 
-    // 次へ
+    // 次のタスクまでのカウントダウン
     private fun announceIntermission(seconds: Int) {
         Bukkit.getOnlinePlayers().forEach { player ->
-            player.sendTitle("§f次のタスクまで", "§e§l$seconds", 0, 20, 0)
+            player.sendTitle(
+                "§f次のタスクまで",
+                "§e§l$seconds",
+                0,
+                20,
+                0
+            )
 
             if (seconds <= 3) {
-                player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f, 1.0f)
+                player.playSound(
+                    player.location,
+                    Sound.BLOCK_NOTE_BLOCK_HAT,
+                    1.0f,
+                    1.0f
+                )
             }
         }
     }
 
-    // ゲーム終了！
+    // ゲーム終了
     private fun finishGame() {
-
         Bukkit.getOnlinePlayers().forEach { player ->
-            player.sendMessage( "§a§l[おつかい] §fゲーム終了！おつかれさまでした！" )
-            player.playSound(player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f )
+            player.sendMessage(
+                "§a§l[おつかい] §fゲーム終了！おつかれさまでした！"
+            )
+
+            player.playSound(
+                player.location,
+                Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
+                1.0f,
+                1.0f
+            )
         }
 
         bossBar.hide()
         bossBar.removeAll()
+
+        scoreboard.hide()
+        scoreboard.remove()
 
         runnerTeam.clear()
 

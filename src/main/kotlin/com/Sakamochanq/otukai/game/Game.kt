@@ -46,7 +46,8 @@ class Game(
         startCurrentTask()
     }
 
-    fun addProgress(amount: Int): Boolean {
+    // 現在のタスクが達成されていたら次のタスクへの待機状態にする
+    fun checkTaskCompleted(): Boolean {
         if (state != GameState.PLAYING) {
             return false
         }
@@ -54,14 +55,13 @@ class Game(
         val session = currentTask
             ?: return false
 
-        session.addProgress(amount)
-
-        if (session.isCompleted) {
-            startIntermission()
-            return true
+        if (!session.isCompleted) {
+            return false
         }
 
-        return false
+        startIntermission()
+
+        return true
     }
 
     fun tick(elapsed: Duration) {
@@ -84,7 +84,8 @@ class Game(
     }
 
     private fun tickPlaying(elapsed: Duration) {
-        val session = currentTask ?: return
+        val session = currentTask
+            ?: return
 
         session.tick(elapsed)
 

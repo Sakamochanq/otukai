@@ -4,20 +4,37 @@ import com.Sakamochanq.otukai.OtukaiPlugin
 import com.Sakamochanq.otukai.game.GameState
 import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
-import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityPickupItemEvent
+import org.bukkit.event.entity.EntityDeathEvent
+import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryDragEvent
+import org.bukkit.event.player.PlayerDropItemEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
 
 class TaskProgressListener(
     private val plugin: OtukaiPlugin
 ) : Listener {
 
-    @EventHandler
-    fun onItemPickup(event: EntityPickupItemEvent) {
-        val player = event.entity as? org.bukkit.entity.Player
-            ?: return
+    /**
+     * インベントリ内の対象アイテム数を数える
+     */
+    private fun countItem(
+        player: Player,
+        itemTask: ItemTask
+    ): Int {
+        return player.inventory.contents
+            .filterNotNull()
+            .filter { it.type == itemTask.item }
+            .sumOf { it.amount }
+    }
 
+    /**
+     * アイテムタスクの進捗を現在のインベントリから更新
+     */
+    private fun updateItemProgress(player: Player) {
         val game = plugin.gameManager.getGame()
             ?: return
 
@@ -35,20 +52,111 @@ class TaskProgressListener(
         val task = session.task as? ItemTask
             ?: return
 
-        val itemStack = event.item.itemStack
+        val currentAmount = countItem(player, task)
 
-        if (itemStack.type != task.item) {
-            return
-        }
-
-        plugin.gameManager.addProgress(
+        session.updateItemProgress(
             player = player,
-            amount = itemStack.amount
+            currentAmount = currentAmount
         )
     }
-    
+
+    /**
+     * アイテムを拾ったとき
+     */
     @EventHandler
-    fun onEntityDeath(event: EntityDeathEvent) {
+    fun onItemPickup(
+        event: org.bukkit.event.entity.EntityPickupItemEvent
+    ) {
+        val player = event.entity as? Player
+            ?: return
+
+        // 実際に拾った後のインベントリ状態を取得するため、
+        // イベント処理が終わった次のtickで確認する
+        plugin.server.scheduler.runTask(
+            plugin,
+            Runnable {
+                updateItemProgress(player)
+            }
+        )
+    }
+
+    /**
+     * アイテムを捨てたとき
+     */
+    @EventHandler
+    fun onItemDrop(
+        event: PlayerDropItemEvent
+    ) {
+        val player = event.player
+
+        plugin.server.scheduler.runTask(
+            plugin,
+            Runnable {
+                updateItemProgress(player)
+            }
+        )
+    }
+
+    /**
+     * インベントリをクリックしたとき
+     */
+    @EventHandler
+    fun onInventoryClick(
+        event: InventoryClickEvent
+    ) {
+        val player = event.whoClicked as? Player
+            ?: return
+
+        plugin.server.scheduler.runTask(
+            plugin,
+            Runnable {
+                updateItemProgress(player)
+            }
+        )
+    }
+
+    /**
+     * インベントリをドラッグしたとき
+     */
+    @EventHandler
+    fun onInventoryDrag(
+        event: InventoryDragEvent
+    ) {
+        val player = event.whoClicked as? Player
+            ?: return
+
+        plugin.server.scheduler.runTask(
+            plugin,
+            Runnable {
+                updateItemProgress(player)
+            }
+        )
+    }
+
+    /**
+     * アイテムを消費したとき
+     */
+    @EventHandler
+    fun onItemConsume(
+        event: PlayerItemConsumeEvent
+    ) {
+        val player = event.player
+
+        plugin.server.scheduler.runTask(
+            plugin,
+            Runnable {
+                updateItemProgress(player)
+            }
+        )
+    }
+
+    /**
+     * エンティティを倒したとき
+     */
+    @EventHandler
+    fun onEntityDeath(
+        event: EntityDeathEvent
+    ) {
         val player = event.entity.killer
             ?: return
 
@@ -74,5 +182,5 @@ class TaskProgressListener(
         }
 
         plugin.gameManager.addKillProgress(player)
-}
+    }
 }
