@@ -286,7 +286,7 @@ class GameManager {
 
             player.playSound(
                 player.location,
-                Sound.BLOCK_NOTE_BLOCK_BELL,
+                Sound.ENTITY_PLAYER_LEVELUP,
                 1.0f,
                 1.0f
             )
@@ -327,7 +327,7 @@ class GameManager {
 
             player.playSound(
                 player.location,
-                Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
+                Sound.BLOCK_NOTE_BLOCK_BELL,
                 1.0f,
                 1.0f
             )
