@@ -3,6 +3,8 @@ package com.Sakamochanq.otukai.task
 import com.Sakamochanq.otukai.task.item.ItemTask
 import org.bukkit.Material
 import kotlin.time.Duration.Companion.minutes
+import com.Sakamochanq.otukai.task.kill.KillTask
+import org.bukkit.entity.EntityType
 
 object TaskList {
 
@@ -18,6 +20,13 @@ object TaskList {
             displayName = "丸石",
             amount = 32,
             timeLimit = 3.minutes
+        ),
+        KillTask(
+            entityType = EntityType.COW,
+            amount = 3,
+            displayName = "牛",
+            timeLimit = 3.minutes
         )
+
     )
 }

@@ -4,6 +4,7 @@ import com.Sakamochanq.otukai.player.RunnerTeam
 import com.Sakamochanq.otukai.task.TaskList
 import com.Sakamochanq.otukai.ui.GameBossBar
 import com.Sakamochanq.otukai.task.item.ItemTask
+import com.Sakamochanq.otukai.task.kill.KillTask
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.Player
@@ -101,6 +102,33 @@ class GameManager {
     Bukkit.getOnlinePlayers().forEach {
         it.sendMessage("§b$message")
     }
+
+        if (completed) {
+            announceTaskCompleted()
+        }
+    }
+
+    fun addKillProgress(player: Player) {
+        val currentGame = game
+            ?: return
+
+        if (currentGame.state != GameState.PLAYING) {
+            return
+        }
+
+        val session = currentGame.currentTask
+            ?: return
+
+        val task = session.task as? KillTask
+            ?: return
+
+        val completed = currentGame.addProgress(1)
+
+        Bukkit.getOnlinePlayers().forEach {
+            it.sendMessage(
+                "§b${task.killMessage(player.name)}"
+            )
+        }
 
         if (completed) {
             announceTaskCompleted()
