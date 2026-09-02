@@ -4,6 +4,11 @@ import com.Sakamochanq.otukai.OtukaiPlugin
 import com.Sakamochanq.otukai.game.GameState
 import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
+import com.Sakamochanq.otukai.task.use.UseItemTask
+import com.Sakamochanq.otukai.task.use.UseType
+import org.bukkit.event.player.PlayerBucketFillEvent
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -14,6 +19,8 @@ import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.Sound
+import org.bukkit.Material
+
 
 class TaskProgressListener(
     private val plugin: OtukaiPlugin
@@ -170,5 +177,49 @@ class TaskProgressListener(
         }
 
         plugin.gameManager.addKillProgress(player)
+    }
+
+
+    @EventHandler
+    fun onBucketFill(event: PlayerBucketFillEvent) {
+        if (event.isCancelled) return
+
+        val player = event.player
+
+        val game = plugin.gameManager.getGame() ?: return
+        if (game.state != GameState.PLAYING) return
+        if (!game.players.contains(player)) return
+
+        val session = game.currentTask ?: return
+        val task = session.task as? UseItemTask ?: return
+
+        if (task.useType != UseType.BUCKET_FILL) return
+
+        // 実際に使用したバケツを確認する
+        if (event.bucket != task.item) return
+
+        plugin.gameManager.addUseItemProgress(player)
+    }
+
+    // 牛乳バケツ
+    @EventHandler
+    fun onMilkBucketUse(event: PlayerInteractEntityEvent) {
+        val player = event.player
+
+        val game = plugin.gameManager.getGame() ?: return
+        if (game.state != GameState.PLAYING) return
+        if (!game.players.contains(player)) return
+
+        val session = game.currentTask ?: return
+        val task = session.task as? UseItemTask ?: return
+
+        if (task.useType != UseType.BUCKET_FILL) return
+
+        val item = player.inventory.itemInMainHand ?: return
+        if (item.type != Material.BUCKET) return
+
+        if (event.rightClicked.type != EntityType.COW) return
+
+        plugin.gameManager.addUseItemProgress(player)
     }
 }

@@ -4,6 +4,7 @@ import com.Sakamochanq.otukai.player.RunnerTeam
 import com.Sakamochanq.otukai.task.TaskList
 import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
+import com.Sakamochanq.otukai.task.use.UseItemTask
 import com.Sakamochanq.otukai.ui.GameBossBar
 import com.Sakamochanq.otukai.ui.GameScoreboard
 import org.bukkit.Bukkit
@@ -243,6 +244,27 @@ class GameManager {
             }
 
             GameState.IDLE -> Unit
+        }
+    }
+
+    // アイテム使用系タスクの進捗を追加
+    fun addUseItemProgress(player: Player) {
+        val currentGame = game ?: return
+        if (currentGame.state != GameState.PLAYING) return
+        if (!currentGame.players.contains(player)) return
+
+        val session = currentGame.currentTask ?: return
+        session.task as? UseItemTask ?: return
+
+        session.addProgress(
+            player = player,
+            amount = 1
+        )
+
+        scoreboard.show(currentGame)
+
+        if (session.isCompleted && currentGame.checkTaskCompleted()) {
+            announceTaskCompleted()
         }
     }
 
