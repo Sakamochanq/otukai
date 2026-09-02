@@ -13,6 +13,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.Sound
 
 class TaskProgressListener(
     private val plugin: OtukaiPlugin
@@ -31,29 +32,32 @@ class TaskProgressListener(
 
     // アイテムタスクの進捗を現在のインベントリから更新
     private fun updateItemProgress(player: Player) {
-        val game = plugin.gameManager.getGame()
-            ?: return
-
-        if (game.state != GameState.PLAYING) {
-            return
-        }
-
-        if (!game.players.contains(player)) {
-            return
-        }
-
-        val session = game.currentTask
-            ?: return
-
-        val task = session.task as? ItemTask
-            ?: return
-
+        val game = plugin.gameManager.getGame() ?: return
+        if (game.state != GameState.PLAYING) return
+        if (!game.players.contains(player)) return
+        
+        val session = game.currentTask ?: return
+        val task = session.task as? ItemTask ?: return
+        
+        val beforeProgress = session.getProgress(player)
+        
         val currentAmount = countItem(player, task)
-
         session.updateItemProgress(
             player = player,
             currentAmount = currentAmount
         )
+        
+        val afterProgress = session.getProgress(player)
+        
+        // タスクの進捗として新しく記録された場合だけ効果音を鳴らす
+        if (afterProgress > beforeProgress) {
+            player.playSound(
+                player.location,
+                Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
+                0.6f,
+                1.2f
+            )
+        }
     }
 
     // アイテム拾う
