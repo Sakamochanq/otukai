@@ -50,11 +50,18 @@ object TaskList {
         ),
         UseItemTask(
             item = Material.IRON_HOE,
-            amount = 10,
+            amount = 20,
             displayName = "クワ",
             useType = UseType.HOE_TILL,
             timeLimit = 3.minutes,
         ),
+        UseItemTask(
+            item = Material.SHEARS,
+            amount = 3,
+            displayName = "ハサミ",
+            useType = UseType.SHEARS_CUT,
+            timeLimit = 2.minutes
+        )
 
     )
 }

@@ -9,6 +9,7 @@ import com.Sakamochanq.otukai.task.use.UseType
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
+import org.bukkit.event.player.PlayerShearEntityEvent
 import org.bukkit.block.Block
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -275,5 +276,28 @@ class TaskProgressListener(
 
             else -> false
         }
+    }
+
+    // 羊の毛を刈る
+    @EventHandler
+    fun onShearEntity(event: PlayerShearEntityEvent) {
+        if (event.isCancelled) return
+    
+        val player = event.player
+    
+        val game = plugin.gameManager.getGame() ?: return
+        if (game.state != GameState.PLAYING) return
+        if (!game.players.contains(player)) return
+    
+        val session = game.currentTask ?: return
+        val task = session.task as? UseItemTask ?: return
+    
+        if (task.useType != UseType.SHEARS_CUT) return
+    
+        // 羊以外は対象外
+        if (event.entity.type != EntityType.SHEEP) return
+    
+        // 実際に羊の毛刈りが成功した場合だけカウント
+        plugin.gameManager.addUseItemProgress(player)
     }
 }
