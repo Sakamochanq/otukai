@@ -157,76 +157,50 @@ class GameManager {
         }
     }
 
+    // おつかい開始のアナウンスを全員に送信する
     private fun announceTaskStarted(game: Game) {
         val session = game.currentTask
             ?: return
 
         Bukkit.getOnlinePlayers().forEach { player ->
-            player.sendTitle(
-                "§e§lおつかい！",
-                "§f${session.task.description}",
-                10,
-                50,
-                10
-            )
+            player.sendTitle("§e§lおつかい！", "§f${session.task.description}", 10, 50, 10)
 
-            player.sendMessage(
-                "§e§lおつかい！ §f${session.task.description}"
-            )
+            player.sendMessage("§e§lおつかい！ §f${session.task.description}")
 
-            player.playSound(
-                player.location,
-                Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
-                1.0f,
-                1.0f
-            )
+            player.playSound(player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f)
         }
     }
 
+    // おつかい完了
     private fun announceTaskCompleted() {
         Bukkit.getOnlinePlayers().forEach { player ->
-            player.sendTitle(
-                "§a§lタスク達成！",
-                "§f次のタスクへ！",
-                5,
-                30,
-                10
-            )
-
-            player.playSound(
-                player.location,
-                Sound.UI_TOAST_CHALLENGE_COMPLETE,
-                1.0f,
-                1.0f
-            )
+            player.sendTitle("§a§lタスク達成！", "§f次のタスクへ！", 5, 30, 10)
+            player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_BELL, 1.0f, 1.0f)
         }
 
         announceIntermission(5)
         lastIntermissionSecond = 5
     }
 
+    // 次へ
     private fun announceIntermission(seconds: Int) {
         Bukkit.getOnlinePlayers().forEach { player ->
-            player.sendTitle(
-                "§f次のタスクまで",
-                "§e§l$seconds",
-                0,
-                20,
-                0
-            )
+            player.sendTitle("§f次のタスクまで", "§e§l$seconds", 0, 20, 0)
 
             if (seconds <= 3) {
-                player.playSound(
-                    player.location,
-                    Sound.BLOCK_NOTE_BLOCK_HAT,
-                    1.0f,
-                    1.0f
-                )
+                player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f, 1.0f)
             }
         }
     }
 
+    // ゲーム終了！
     private fun finishGame() {
+
+        Bukkit.getOnlinePlayers().forEach { player ->
+            player.sendMessage( "§a§l[おつかい] §fゲーム終了！おつかれさまでした！" )
+            player.playSound(player.location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0f, 1.0f )
+        }
+
         bossBar.hide()
         bossBar.removeAll()
 
