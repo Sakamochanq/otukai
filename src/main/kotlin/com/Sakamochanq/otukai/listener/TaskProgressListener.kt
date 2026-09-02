@@ -9,6 +9,7 @@ import com.Sakamochanq.otukai.task.use.UseType
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
+import org.bukkit.block.Block
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -20,7 +21,6 @@ import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.Sound
 import org.bukkit.Material
-
 
 class TaskProgressListener(
     private val plugin: OtukaiPlugin
@@ -221,5 +221,59 @@ class TaskProgressListener(
         if (event.rightClicked.type != EntityType.COW) return
 
         plugin.gameManager.addUseItemProgress(player)
+    }
+
+    private fun isHoe(material: Material): Boolean {
+        return material == Material.WOODEN_HOE ||
+               material == Material.STONE_HOE ||
+               material == Material.IRON_HOE ||
+               material == Material.GOLDEN_HOE ||
+               material == Material.DIAMOND_HOE ||
+               material == Material.NETHERITE_HOE
+    }
+
+    @EventHandler
+    fun onHoeTill(event: PlayerInteractEvent) {
+        if (event.action != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) {
+            return
+        }
+
+        val player = event.player
+
+        val game = plugin.gameManager.getGame() ?: return
+        if (game.state != GameState.PLAYING) return
+        if (!game.players.contains(player)) return
+
+        val session = game.currentTask ?: return
+        val task = session.task as? UseItemTask ?: return
+
+        if (task.useType != UseType.HOE_TILL) return
+
+        val item = player.inventory.itemInMainHand
+        if (!isHoe(item.type)) return
+
+        val block = event.clickedBlock ?: return
+
+        if (!isTillableBlock(block)) return
+
+        // 実際に耕地へ変化した後に判定する
+        plugin.server.scheduler.runTask(
+            plugin,
+            Runnable {
+                if (block.type == Material.FARMLAND) {
+                    plugin.gameManager.addUseItemProgress(player)
+                }
+            }
+        )
+    }
+
+    private fun isTillableBlock(block: Block): Boolean {
+        return when (block.type) {
+            Material.DIRT,
+            Material.GRASS_BLOCK,
+            Material.DIRT_PATH -> true
+
+            else -> false
+        }
     }
 }

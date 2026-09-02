@@ -47,7 +47,14 @@ object TaskList {
             displayName = "バケツ",
             useType = UseType.BUCKET_FILL,
             timeLimit = 5.minutes,
-        )
+        ),
+        UseItemTask(
+            item = Material.IRON_HOE,
+            amount = 10,
+            displayName = "クワ",
+            useType = UseType.HOE_TILL,
+            timeLimit = 3.minutes,
+        ),
 
     )
 }
