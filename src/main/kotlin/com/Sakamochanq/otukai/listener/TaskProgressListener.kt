@@ -18,9 +18,7 @@ class TaskProgressListener(
     private val plugin: OtukaiPlugin
 ) : Listener {
 
-    /**
-     * インベントリ内の対象アイテム数を数える
-     */
+    // インベントリ内の対象アイテム数を数える
     private fun countItem(
         player: Player,
         itemTask: ItemTask
@@ -31,9 +29,7 @@ class TaskProgressListener(
             .sumOf { it.amount }
     }
 
-    /**
-     * アイテムタスクの進捗を現在のインベントリから更新
-     */
+    // アイテムタスクの進捗を現在のインベントリから更新
     private fun updateItemProgress(player: Player) {
         val game = plugin.gameManager.getGame()
             ?: return
@@ -60,9 +56,7 @@ class TaskProgressListener(
         )
     }
 
-    /**
-     * アイテムを拾ったとき
-     */
+    // アイテム拾う
     @EventHandler
     fun onItemPickup(
         event: org.bukkit.event.entity.EntityPickupItemEvent
@@ -80,9 +74,7 @@ class TaskProgressListener(
         )
     }
 
-    /**
-     * アイテムを捨てたとき
-     */
+    // アイテム捨てる
     @EventHandler
     fun onItemDrop(
         event: PlayerDropItemEvent
@@ -97,9 +89,7 @@ class TaskProgressListener(
         )
     }
 
-    /**
-     * インベントリをクリックしたとき
-     */
+    // インベントリクリック
     @EventHandler
     fun onInventoryClick(
         event: InventoryClickEvent
@@ -115,9 +105,7 @@ class TaskProgressListener(
         )
     }
 
-    /**
-     * インベントリをドラッグしたとき
-     */
+    // インベントリドラッグ
     @EventHandler
     fun onInventoryDrag(
         event: InventoryDragEvent
@@ -133,9 +121,7 @@ class TaskProgressListener(
         )
     }
 
-    /**
-     * アイテムを消費したとき
-     */
+    // アイテム消費
     @EventHandler
     fun onItemConsume(
         event: PlayerItemConsumeEvent
@@ -150,9 +136,7 @@ class TaskProgressListener(
         )
     }
 
-    /**
-     * エンティティを倒したとき
-     */
+    // エンティティキル
     @EventHandler
     fun onEntityDeath(
         event: EntityDeathEvent
