@@ -55,6 +55,8 @@ class GameScoreboard {
         // 空白
         displayEntries.add("§0 ")
 
+        displayEntries.add("§e現在のタスク:")
+
         // タスク内容
         displayEntries.add(
             "§f${task.description}"
@@ -152,7 +154,7 @@ class GameScoreboard {
         progress: Int,
         unit: String
     ): String {
-        return "§f$playerName §7» §a${progress}${unit}"
+        return "§f$playerName §7| §a${progress}${unit}"
     }
 
     private fun createTotalEntry(
@@ -160,7 +162,7 @@ class GameScoreboard {
         target: Int,
         unit: String
     ): String {
-        return "§e合計 §7» §a${progress}/${target}${unit}"
+        return "§e合計 §7| §a${progress}/${target}${unit}"
     }
 
     private fun clear() {
