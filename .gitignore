@@ -2,6 +2,12 @@
 .gradle/
 build/
 
+# Kotlin
+.kotlin/
+
+# Build output
+bin/
+
 # IntelliJ IDEA
 .idea/
 *.iml
