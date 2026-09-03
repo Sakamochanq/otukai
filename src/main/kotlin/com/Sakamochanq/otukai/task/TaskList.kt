@@ -82,21 +82,21 @@ object TaskList {
             amount = 1,
             displayName = "バケツ",
             useType = UseType.BUCKET_FILL,
-            timeLimit = 5.minutes,
+            timeLimit = 10.minutes,
         ),
         UseItemTask(
             item = Material.IRON_HOE,
             amount = 20,
             displayName = "クワ",
             useType = UseType.HOE_TILL,
-            timeLimit = 3.minutes,
+            timeLimit = 5.minutes,
         ),
         UseItemTask(
             item = Material.SHEARS,
             amount = 3,
             displayName = "ハサミ",
             useType = UseType.SHEARS_CUT,
-            timeLimit = 2.minutes
+            timeLimit = 10.minutes
         )
 
     )
