@@ -2,6 +2,7 @@ package com.Sakamochanq.otukai.game
 
 import com.Sakamochanq.otukai.task.Task
 import com.Sakamochanq.otukai.task.TaskSession
+import com.Sakamochanq.otukai.task.fish.FishTask
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -28,6 +29,10 @@ class Game(
     var intermissionRemaining: Duration = Duration.ZERO
         private set
 
+    // 釣りタスクが解禁されているか
+    var fishingUnlocked: Boolean = false
+        private set
+
     fun start() {
         check(state == GameState.IDLE) {
             "Game is already started."
@@ -43,7 +48,13 @@ class Game(
 
         state = GameState.PLAYING
         currentTaskIndex = 0
+        fishingUnlocked = false
+
         startCurrentTask()
+    }
+
+    fun unlockFishing() {
+        fishingUnlocked = true
     }
 
     fun checkTaskCompleted(): Boolean {
@@ -108,14 +119,20 @@ class Game(
     }
 
     private fun startCurrentTask() {
-        val task = shuffledTasks.getOrNull(currentTaskIndex)
+        while (currentTaskIndex < shuffledTasks.size) {
+            val task = shuffledTasks[currentTaskIndex]
 
-        if (task == null) {
-            finish()
+            // 釣りタスクが未解禁ならスキップ
+            if (task is FishTask && !fishingUnlocked) {
+                currentTaskIndex++
+                continue
+            }
+
+            currentTask = TaskSession(task)
             return
         }
 
-        currentTask = TaskSession(task)
+        finish()
     }
 
     private fun startIntermission() {

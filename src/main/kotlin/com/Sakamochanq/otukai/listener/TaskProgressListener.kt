@@ -31,6 +31,28 @@ class TaskProgressListener(
     private val plugin: OtukaiPlugin
 ) : Listener {
 
+    // 釣りタスクの解禁条件を確認
+    private fun checkFishingUnlock(player: Player) {
+        val game = plugin.gameManager.getGame() ?: return
+
+        if (game.state != GameState.PLAYING) return
+        if (!game.players.contains(player)) return
+
+        if (game.fishingUnlocked) return
+
+        val hasFishingRod = player.inventory.contents
+            .filterNotNull()
+            .any { it.type == Material.FISHING_ROD }
+
+        val hasString = player.inventory.contents
+            .filterNotNull()
+            .any { it.type == Material.STRING }
+
+        if (hasFishingRod || hasString) {
+            game.unlockFishing()
+        }
+    }
+
     // インベントリ内の対象アイテム数を数える
     private fun countItem(
         player: Player,
@@ -85,6 +107,7 @@ class TaskProgressListener(
         plugin.server.scheduler.runTask(
             plugin,
             Runnable {
+                checkFishingUnlock(player)
                 updateItemProgress(player)
             }
         )
@@ -116,6 +139,7 @@ class TaskProgressListener(
         plugin.server.scheduler.runTask(
             plugin,
             Runnable {
+                checkFishingUnlock(player)
                 updateItemProgress(player)
             }
         )
@@ -328,20 +352,22 @@ class TaskProgressListener(
     @EventHandler
     fun onCraftItem(event: CraftItemEvent) {
         val player = event.whoClicked as? Player ?: return
-    
+
         val game = plugin.gameManager.getGame() ?: return
         if (game.state != GameState.PLAYING) return
         if (!game.players.contains(player)) return
-    
+
         val session = game.currentTask ?: return
         val task = session.task as? CraftTask ?: return
-    
+
         val result = event.currentItem ?: return
         if (result.type != task.item) return
-    
+
         plugin.gameManager.addCraftProgress(
             player = player,
             amount = result.amount
         )
+
+        checkFishingUnlock(player)
     }
 }
