@@ -36,29 +36,22 @@ class GameBossBar {
     fun update(game: Game) {
         val session = game.currentTask
             ?: return
-
-        val task = session.task
-
+    
         val remaining = session.remainingTime
-        val total = task.timeLimit
-
+        val total = session.timeLimit
+    
         val progress = if (total.isPositive()) {
             (remaining / total).toDouble()
         } else {
             0.0
         }
-
+    
         bossBar.setProgress(
             min(1.0, max(0.0, progress))
         )
-
+    
         bossBar.setTitle(
             formatTime(remaining)
-            // buildString {
-            //     append(task.description)
-            //     append("  ")
-            //     append(formatTime(remaining))
-            // }
         )
     }
 
