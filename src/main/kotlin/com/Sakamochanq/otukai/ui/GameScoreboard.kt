@@ -4,6 +4,7 @@ import com.Sakamochanq.otukai.game.Game
 import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
 import com.Sakamochanq.otukai.task.use.UseItemTask
+import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
 import org.bukkit.Bukkit
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Objective
@@ -50,6 +51,7 @@ class GameScoreboard {
             is ItemTask -> "個"
             is KillTask -> "匹"
             is UseItemTask -> "回"
+            is BreakBlockTask -> "個"
             else -> ""
         }
 
