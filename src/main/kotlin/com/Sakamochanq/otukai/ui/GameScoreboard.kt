@@ -51,6 +51,10 @@ class GameScoreboard {
             else -> 0
         }
 
+        Bukkit.getLogger().info(
+            "[otukai] Task=${task::class.simpleName}, targetAmount=$targetAmount"
+        )
+
         // タスクの単位
         val unit = when (task) {
             is ItemTask -> "個"
