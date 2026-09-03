@@ -2,10 +2,39 @@ package com.Sakamochanq.otukai.task
 
 import org.bukkit.entity.Player
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class TaskSession(
-    val task: Task
+    val task: Task,
+    playerCount: Int
 ) {
+    init {
+        require(playerCount >= 1) {
+            "Player count must be at least 1."
+        }
+    }
+
+    // 参加人数
+    val playerCount: Int = playerCount
+
+    // 人数に応じて調整された目標数
+    val targetAmount: Int
+        get() {
+            val baseAmount = getBaseAmount()
+            return baseAmount * playerCount
+        }
+
+    // 人数に応じて調整された制限時間
+    val timeLimit: Duration
+        get() {
+            val baseTime = task.timeLimit
+            val additionalTime = 15.seconds * (playerCount - 1)
+            val maxTime = baseTime * 2
+
+            return (baseTime + additionalTime)
+                .coerceAtMost(maxTime)
+        }
+
     // プレイヤーごとのゲーム開始時のアイテム所持数
     private val initialItemCounts: MutableMap<Player, Int> = mutableMapOf()
 
@@ -17,12 +46,12 @@ class TaskSession(
         get() = playerProgress.values.sum()
 
     // 残り時間
-    var remainingTime: Duration = task.timeLimit
+    var remainingTime: Duration = timeLimit
         private set
 
     // タスクの完了判定
     val isCompleted: Boolean
-        get() = task.isCompleted(progress)
+        get() = progress >= targetAmount
 
     // 時間切れの判定
     val isTimedOut: Boolean
@@ -109,5 +138,30 @@ class TaskSession(
 
         remainingTime = (remainingTime - elapsed)
             .coerceAtLeast(Duration.ZERO)
+    }
+
+    // Taskの基本目標数を取得
+    private fun getBaseAmount(): Int {
+        return when (task) {
+            is com.Sakamochanq.otukai.task.item.ItemTask ->
+                task.amount
+
+            is com.Sakamochanq.otukai.task.kill.KillTask ->
+                task.amount
+
+            is com.Sakamochanq.otukai.task.use.UseItemTask ->
+                task.amount
+
+            is com.Sakamochanq.otukai.task.breakblock.BreakBlockTask ->
+                task.amount
+
+            is com.Sakamochanq.otukai.task.craft.CraftTask ->
+                task.amount
+
+            is com.Sakamochanq.otukai.task.fish.FishTask ->
+                task.amount
+
+            else -> 0
+        }
     }
 }

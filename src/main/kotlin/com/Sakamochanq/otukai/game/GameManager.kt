@@ -8,6 +8,7 @@ import com.Sakamochanq.otukai.task.use.UseItemTask
 import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
 import com.Sakamochanq.otukai.task.fish.FishTask
 import com.Sakamochanq.otukai.task.craft.CraftTask
+import com.Sakamochanq.otukai.task.TaskDescriptionFormatter
 import com.Sakamochanq.otukai.ui.GameBossBar
 import com.Sakamochanq.otukai.ui.GameScoreboard
 import org.bukkit.Bukkit
@@ -322,27 +323,31 @@ class GameManager {
 
     // おつかい開始のアナウンス
     private fun announceTaskStarted(game: Game) {
-        val session = game.currentTask
-            ?: return
+        val session = game.currentTask ?: return
+
+        val taskDescription = TaskDescriptionFormatter.create(
+            task = session.task,
+            targetAmount = session.targetAmount
+        )
 
         Bukkit.getOnlinePlayers().forEach { player ->
             player.sendTitle(
                 "§e§lおつかい！",
-                "§f${session.task.description}",
+                "§f$taskDescription",
                 10,
                 50,
                 10
             )
 
             player.sendMessage(
-                "§e§lおつかい！ §f${session.task.description}"
+                "§a§l[おつかい] §f$taskDescription"
             )
 
             player.playSound(
                 player.location,
                 Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
                 1.0f,
-                1.0f
+                1.2f
             )
         }
     }

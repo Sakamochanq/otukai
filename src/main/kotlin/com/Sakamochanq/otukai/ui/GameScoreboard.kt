@@ -1,12 +1,14 @@
 package com.Sakamochanq.otukai.ui
 
 import com.Sakamochanq.otukai.game.Game
+import com.Sakamochanq.otukai.task.Task
 import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
 import com.Sakamochanq.otukai.task.use.UseItemTask
 import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
 import com.Sakamochanq.otukai.task.craft.CraftTask
 import com.Sakamochanq.otukai.task.fish.FishTask
+import com.Sakamochanq.otukai.task.TaskDescriptionFormatter
 import org.bukkit.Bukkit
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Objective
@@ -41,15 +43,18 @@ class GameScoreboard {
         val task = session.task
 
         // タスクのノルマ
-        val targetAmount = when (task) {
-            is ItemTask -> task.amount
-            is KillTask -> task.amount
-            is UseItemTask -> task.amount
-            is BreakBlockTask -> task.amount
-            is CraftTask -> task.amount
-            is FishTask -> task.amount
-            else -> 0
-        }
+        // val targetAmount = when (task) {
+        //     is ItemTask -> task.amount
+        //     is KillTask -> task.amount
+        //     is UseItemTask -> task.amount
+        //     is BreakBlockTask -> task.amount
+        //     is CraftTask -> task.amount
+        //     is FishTask -> task.amount
+        //     else -> 0
+        // }
+
+        // 人数に応じて調整されたタスクのノルマ
+        val targetAmount = session.targetAmount
 
         Bukkit.getLogger().info(
             "[otukai] Task=${task::class.simpleName}, targetAmount=$targetAmount"
@@ -75,7 +80,7 @@ class GameScoreboard {
 
         // タスク内容
         displayEntries.add(
-            "§f${task.description}"
+            "§f${TaskDescriptionFormatter.create(task, session.targetAmount)}"
         )
 
         // 空白

@@ -128,7 +128,7 @@ class Game(
                 continue
             }
 
-            currentTask = TaskSession(task)
+            currentTask = TaskSession(task, players.size)
             return
         }
 

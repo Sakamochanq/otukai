@@ -80,6 +80,6 @@ class GameBossBar {
         val minutes = totalSeconds / 60
         val seconds = totalSeconds % 60
 
-        return "§a§l残り時間:  §f§r" + "%02d:%02d".format(minutes, seconds)
+        return "§a§l残り時間: §f§r" + "%02d:%02d".format(minutes, seconds)
     }
 }
