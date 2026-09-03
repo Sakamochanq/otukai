@@ -24,6 +24,9 @@ class GameManager {
     private val scoreboard = GameScoreboard()
 
     private var lastIntermissionSecond: Int? = null
+    
+    // クラフト前の対象アイテム数
+    private val craftInitialCounts: MutableMap<Player, Int> = mutableMapOf()
 
     val isRunning: Boolean
         get() = game?.state == GameState.PLAYING ||
@@ -111,6 +114,44 @@ class GameManager {
             )
         }
     }
+
+    // インベントリ内のクラフト対象アイテム数を数える
+    fun countCraftItem(
+        player: Player,
+        task: CraftTask
+    ): Int {
+        return player.inventory.contents
+            .filterNotNull()
+            .filter { it.type == task.item }
+            .sumOf { it.amount }
+    }
+
+    // クラフト前のアイテム数を記録する
+    fun setCraftInitialCount(
+        player: Player,
+        task: CraftTask
+    ) {
+        craftInitialCounts[player] = countCraftItem(
+            player = player,
+            task = task
+        )
+    }
+
+    // クラフトによって増えたアイテム数を取得する
+    // fun getCraftedAmount(
+    //     player: Player,
+    //     task: CraftTask
+    // ): Int {
+    //     val initialAmount = craftInitialCounts[player]
+    //         ?: return 0
+    // 
+    //     val currentAmount = countCraftItem(
+    //         player = player,
+    //         task = task
+    //     )
+    // 
+    //     return (currentAmount - initialAmount).coerceAtLeast(0)
+    // }
 
     // インベントリ内の対象アイテム数を数える
     private fun countItem(

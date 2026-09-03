@@ -357,8 +357,29 @@ class TaskProgressListener(
         if (event.state != PlayerFishEvent.State.CAUGHT_FISH) {
             return
         }
-    
+
         val player = event.player
+
+        val game = plugin.gameManager.getGame()
+            ?: return
+
+        if (game.state != GameState.PLAYING) return
+        if (!game.players.contains(player)) return
+
+        val session = game.currentTask
+            ?: return
+
+        val task = session.task as? FishTask
+            ?: return
+
+        plugin.gameManager.addFishProgress(player)
+    }
+
+    // アイテムクラフト
+    @EventHandler
+    fun onCraftItem(event: CraftItemEvent) {
+        val player = event.whoClicked as? Player
+            ?: return
     
         val game = plugin.gameManager.getGame()
             ?: return
@@ -369,32 +390,65 @@ class TaskProgressListener(
         val session = game.currentTask
             ?: return
     
-        val task = session.task as? FishTask
+        val task = session.task as? CraftTask
             ?: return
     
-        plugin.gameManager.addFishProgress(player)
-    }
-
-    // アイテムクラフト
-    @EventHandler
-    fun onCraftItem(event: CraftItemEvent) {
-        val player = event.whoClicked as? Player ?: return
-
-        val game = plugin.gameManager.getGame() ?: return
-        if (game.state != GameState.PLAYING) return
-        if (!game.players.contains(player)) return
-
-        val session = game.currentTask ?: return
-        val task = session.task as? CraftTask ?: return
-
-        val result = event.currentItem ?: return
-        if (result.type != task.item) return
-
-        plugin.gameManager.addCraftProgress(
+        val result = event.currentItem
+            ?: return
+    
+        if (result.type != task.item) {
+            return
+        }
+    
+        // クラフト前のアイテム数を記録
+        val beforeAmount = plugin.gameManager.countCraftItem(
             player = player,
-            amount = result.amount
+            task = task
         )
-
-        checkFishingUnlock(player)
+    
+        plugin.gameManager.setCraftInitialCount(
+            player = player,
+            task = task
+        )
+    
+        // クラフト処理が完了した次のtickで確認
+        plugin.server.scheduler.runTask(
+            plugin,
+            Runnable {
+                val currentGame = plugin.gameManager.getGame()
+                    ?: return@Runnable
+            
+                if (currentGame.state != GameState.PLAYING) {
+                    return@Runnable
+                }
+            
+                if (!currentGame.players.contains(player)) {
+                    return@Runnable
+                }
+            
+                val currentSession = currentGame.currentTask
+                    ?: return@Runnable
+            
+                val currentTask = currentSession.task as? CraftTask
+                    ?: return@Runnable
+            
+                val afterAmount = plugin.gameManager.countCraftItem(
+                    player = player,
+                    task = currentTask
+                )
+            
+                val craftedAmount = (afterAmount - beforeAmount)
+                    .coerceAtLeast(0)
+            
+                if (craftedAmount > 0) {
+                    plugin.gameManager.addCraftProgress(
+                        player = player,
+                        amount = craftedAmount
+                    )
+                }
+            
+                checkFishingUnlock(player)
+            }
+        )
     }
 }
