@@ -6,12 +6,14 @@ import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
 import com.Sakamochanq.otukai.task.use.UseItemTask
 import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
+import com.Sakamochanq.otukai.task.craft.CraftTask
 import com.Sakamochanq.otukai.task.use.UseType
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerShearEntityEvent
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.block.Block
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -320,5 +322,26 @@ class TaskProgressListener(
         if (event.block.type != task.block) return
 
         plugin.gameManager.addBreakBlockProgress(player)
+    }
+
+    // アイテムクラフト
+    @EventHandler
+    fun onCraftItem(event: CraftItemEvent) {
+        val player = event.whoClicked as? Player ?: return
+    
+        val game = plugin.gameManager.getGame() ?: return
+        if (game.state != GameState.PLAYING) return
+        if (!game.players.contains(player)) return
+    
+        val session = game.currentTask ?: return
+        val task = session.task as? CraftTask ?: return
+    
+        val result = event.currentItem ?: return
+        if (result.type != task.item) return
+    
+        plugin.gameManager.addCraftProgress(
+            player = player,
+            amount = result.amount
+        )
     }
 }

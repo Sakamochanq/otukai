@@ -4,6 +4,7 @@ import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
 import com.Sakamochanq.otukai.task.use.UseItemTask
 import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
+import com.Sakamochanq.otukai.task.craft.CraftTask
 import com.Sakamochanq.otukai.task.use.UseType
 import org.bukkit.Material
 import kotlin.time.Duration.Companion.minutes
@@ -103,6 +104,12 @@ object TaskList {
             block = Material.STONE,
             amount = 20,
             displayName = "石",
+            timeLimit = 5.minutes
+        ),
+        CraftTask(
+            item = Material.CRAFTING_TABLE,
+            amount = 1,
+            displayName = "作業台",
             timeLimit = 5.minutes
         )
     )
