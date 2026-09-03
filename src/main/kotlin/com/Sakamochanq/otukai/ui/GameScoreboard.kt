@@ -45,6 +45,9 @@ class GameScoreboard {
             is ItemTask -> task.amount
             is KillTask -> task.amount
             is UseItemTask -> task.amount
+            is BreakBlockTask -> task.amount
+            is CraftTask -> task.amount
+            is FishTask -> task.amount
             else -> 0
         }
 
