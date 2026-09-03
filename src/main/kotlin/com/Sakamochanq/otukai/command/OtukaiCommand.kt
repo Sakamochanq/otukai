@@ -26,24 +26,24 @@ class OtukaiCommand(
         when (args[0].lowercase()) {
             "start" -> {
                 if (plugin.gameManager.start()) {
-                    sender.sendMessage("§aおつかいゲームを開始しました！")
+                    sender.sendMessage("§a§l[おつかい] §aゲームを開始しました！")
                 } else {
-                    sender.sendMessage("§cすでにゲームが実行中です。")
+                    sender.sendMessage("§a§l[おつかい] §cすでにゲームが実行中です。")
                 }
             }
 
             "stop" -> {
                 if (plugin.gameManager.stop()) {
-                    sender.sendMessage("§cおつかいゲームを終了しました。")
+                    sender.sendMessage("§a§l[おつかい] §cゲームを終了しました。")
                 } else {
-                    sender.sendMessage("§c現在ゲームは実行されていません。")
+                    sender.sendMessage("§a§l[おつかい] §c現在ゲームは実行されていません。")
                 }
             }
 
             else -> {
-                sender.sendMessage("§c不明なコマンドです。")
-                sender.sendMessage("§e/otukai start")
-                sender.sendMessage("§e/otukai stop")
+                sender.sendMessage("§a§l[おつかい] §c不明なコマンドです。")
+                sender.sendMessage("§a§l[おつかい] §e/otukai start")
+                sender.sendMessage("§a§l[おつかい] §e/otukai stop")
             }
         }
 

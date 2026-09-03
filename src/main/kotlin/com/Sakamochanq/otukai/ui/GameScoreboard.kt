@@ -20,7 +20,7 @@ class GameScoreboard {
 
     companion object {
         private const val OBJECTIVE_NAME = "otukai_task"
-        private const val OBJECTIVE_TITLE = "§eタスク進捗"
+        private const val OBJECTIVE_TITLE = "§b§lメモ帳"
     }
 
     private var objective: Objective? = null
@@ -64,7 +64,7 @@ class GameScoreboard {
         // 空白
         displayEntries.add("§0 ")
 
-        displayEntries.add("§e現在のタスク:")
+        displayEntries.add("§e現在のおつかい:")
 
         // タスク内容
         displayEntries.add(

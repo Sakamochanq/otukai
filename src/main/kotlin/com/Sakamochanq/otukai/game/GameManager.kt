@@ -351,8 +351,8 @@ class GameManager {
     private fun announceTaskCompleted() {
         Bukkit.getOnlinePlayers().forEach { player ->
             player.sendTitle(
-                "§a§lタスク達成！",
-                "§f次のタスクへ！",
+                "§a§lおつかい達成！",
+                "§f次のおつかいへ！",
                 5,
                 30,
                 10
@@ -374,7 +374,7 @@ class GameManager {
     private fun announceIntermission(seconds: Int) {
         Bukkit.getOnlinePlayers().forEach { player ->
             player.sendTitle(
-                "§f次のタスクまで",
+                "§f次のおつかいまで",
                 "§e§l$seconds",
                 0,
                 20,
@@ -396,12 +396,12 @@ class GameManager {
     private fun finishGame() {
         Bukkit.getOnlinePlayers().forEach { player ->
             player.sendMessage(
-                "§a§l[おつかい] §fゲーム終了！おつかれさまでした！"
+                "§a§l[おつかい] §fゲーム終了！"
             )
 
             player.playSound(
                 player.location,
-                Sound.BLOCK_NOTE_BLOCK_BELL,
+                Sound.BLOCK_ANVIL_LAND,
                 1.0f,
                 1.0f
             )
