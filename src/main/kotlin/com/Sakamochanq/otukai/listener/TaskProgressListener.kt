@@ -5,11 +5,13 @@ import com.Sakamochanq.otukai.game.GameState
 import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
 import com.Sakamochanq.otukai.task.use.UseItemTask
+import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
 import com.Sakamochanq.otukai.task.use.UseType
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerShearEntityEvent
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.block.Block
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -299,5 +301,24 @@ class TaskProgressListener(
     
         // 実際に羊の毛刈りが成功した場合だけカウント
         plugin.gameManager.addUseItemProgress(player)
+    }
+
+    // ブロック破壊
+    @EventHandler
+    fun onBlockBreak(event: BlockBreakEvent) {
+        if (event.isCancelled) return
+
+        val player = event.player
+
+        val game = plugin.gameManager.getGame() ?: return
+        if (game.state != GameState.PLAYING) return
+        if (!game.players.contains(player)) return
+
+        val session = game.currentTask ?: return
+        val task = session.task as? BreakBlockTask ?: return
+
+        if (event.block.type != task.block) return
+
+        plugin.gameManager.addBreakBlockProgress(player)
     }
 }

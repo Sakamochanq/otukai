@@ -5,6 +5,7 @@ import com.Sakamochanq.otukai.task.TaskList
 import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
 import com.Sakamochanq.otukai.task.use.UseItemTask
+import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
 import com.Sakamochanq.otukai.ui.GameBossBar
 import com.Sakamochanq.otukai.ui.GameScoreboard
 import org.bukkit.Bukkit
@@ -373,5 +374,33 @@ class GameManager {
 
         game = null
         lastIntermissionSecond = null
+    }
+
+    // ブロック破壊系タスクの進捗を追加
+    fun addBreakBlockProgress(player: Player) {
+        val currentGame = game ?: return
+        if (currentGame.state != GameState.PLAYING) return
+        if (!currentGame.players.contains(player)) return
+
+        val session = currentGame.currentTask ?: return
+        session.task as? BreakBlockTask ?: return
+
+        session.addProgress(
+            player = player,
+            amount = 1
+        )
+
+        player.playSound(
+            player.location,
+            Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
+            0.6f,
+            1.2f
+        )
+
+        scoreboard.show(currentGame)
+
+        if (session.isCompleted && currentGame.checkTaskCompleted()) {
+            announceTaskCompleted()
+        }
     }
 }
