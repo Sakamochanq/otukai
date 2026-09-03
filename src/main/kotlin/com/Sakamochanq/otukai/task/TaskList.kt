@@ -14,70 +14,10 @@ object TaskList {
 
     val tasks: List<Task> = listOf(
         ItemTask(
-            item = Material.APPLE,
-            displayName = "りんご",
-            amount = 1,
-            timeLimit = 5.minutes
-        ),
-        ItemTask(
             item = Material.WHEAT_SEEDS,
             displayName = "種",
             amount = 10,
             timeLimit = 5.minutes
-        ),
-        ItemTask(
-            item = Material.COBBLESTONE,
-            displayName = "丸石",
-            amount = 32,
-            timeLimit = 5.minutes
-        ),
-        ItemTask(
-            item = Material.OAK_LOG,
-            displayName = "オークの原木",
-            amount = 10,
-            timeLimit = 5.minutes
-        ),
-        ItemTask(
-            item = Material.DIRT,
-            displayName = "土",
-            amount = 30,
-            timeLimit = 5.minutes
-        ),
-        ItemTask(
-            item = Material.COAL,
-            displayName = "石炭",
-            amount = 10,
-            timeLimit = 10.minutes
-        ),
-        ItemTask(
-            item = Material.COPPER_INGOT,
-            displayName = "銅のインゴット",
-            amount = 5,
-            timeLimit = 10.minutes
-        ),
-        ItemTask(
-            item = Material.IRON_INGOT,
-            displayName = "鉄のインゴット",
-            amount = 5,
-            timeLimit = 20.minutes
-        ),
-        KillTask(
-            entityType = EntityType.SHEEP,
-            amount = 1,
-            displayName = "羊",
-            timeLimit = 3.minutes
-        ),
-        KillTask(
-            entityType = EntityType.PIG,
-            amount = 1,
-            displayName = "豚",
-            timeLimit = 3.minutes
-        ),
-        KillTask(
-            entityType = EntityType.COW,
-            amount = 1,
-            displayName = "牛",
-            timeLimit = 3.minutes
         ),
         UseItemTask(
             item = Material.BUCKET,
@@ -86,20 +26,6 @@ object TaskList {
             useType = UseType.BUCKET_FILL,
             timeLimit = 10.minutes,
         ),
-        UseItemTask(
-            item = Material.IRON_HOE,
-            amount = 20,
-            displayName = "クワ",
-            useType = UseType.HOE_TILL,
-            timeLimit = 5.minutes,
-        ),
-        UseItemTask(
-            item = Material.SHEARS,
-            amount = 3,
-            displayName = "ハサミ",
-            useType = UseType.SHEARS_CUT,
-            timeLimit = 10.minutes
-        ),
         BreakBlockTask(
             block = Material.STONE,
             amount = 20,
@@ -107,9 +33,9 @@ object TaskList {
             timeLimit = 5.minutes
         ),
         CraftTask(
-            item = Material.CRAFTING_TABLE,
-            amount = 1,
-            displayName = "作業台",
+            item = Material.STICK,
+            amount = 8,
+            displayName = "棒",
             timeLimit = 5.minutes
         )
     )
