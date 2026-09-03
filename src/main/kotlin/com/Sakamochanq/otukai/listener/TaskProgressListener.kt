@@ -7,12 +7,14 @@ import com.Sakamochanq.otukai.task.kill.KillTask
 import com.Sakamochanq.otukai.task.use.UseItemTask
 import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
 import com.Sakamochanq.otukai.task.craft.CraftTask
+import com.Sakamochanq.otukai.task.fish.FishTask
 import com.Sakamochanq.otukai.task.use.UseType
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerShearEntityEvent
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.player.PlayerFishEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.block.Block
 import org.bukkit.entity.EntityType
@@ -346,6 +348,31 @@ class TaskProgressListener(
         if (event.block.type != task.block) return
 
         plugin.gameManager.addBreakBlockProgress(player)
+    }
+
+    // 魚を釣る
+    @EventHandler
+    fun onFish(event: PlayerFishEvent) {
+        // 実際に魚が釣れた場合だけ処理する
+        if (event.state != PlayerFishEvent.State.CAUGHT_FISH) {
+            return
+        }
+    
+        val player = event.player
+    
+        val game = plugin.gameManager.getGame()
+            ?: return
+    
+        if (game.state != GameState.PLAYING) return
+        if (!game.players.contains(player)) return
+    
+        val session = game.currentTask
+            ?: return
+    
+        val task = session.task as? FishTask
+            ?: return
+    
+        plugin.gameManager.addFishProgress(player)
     }
 
     // アイテムクラフト

@@ -6,6 +6,7 @@ import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
 import com.Sakamochanq.otukai.task.use.UseItemTask
 import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
+import com.Sakamochanq.otukai.task.fish.FishTask
 import com.Sakamochanq.otukai.task.craft.CraftTask
 import com.Sakamochanq.otukai.ui.GameBossBar
 import com.Sakamochanq.otukai.ui.GameScoreboard
@@ -420,6 +421,35 @@ class GameManager {
         session.addProgress(
             player = player,
             amount = amount
+        )
+
+        player.playSound(
+            player.location,
+            Sound.ENTITY_EXPERIENCE_ORB_PICKUP,
+            0.6f,
+            1.2f
+        )
+
+        scoreboard.show(currentGame)
+
+        if (session.isCompleted && currentGame.checkTaskCompleted()) {
+            announceTaskCompleted()
+        }
+    }
+
+    // 釣り系タスクの進捗を追加
+    fun addFishProgress(player: Player) {
+        val currentGame = game ?: return
+
+        if (currentGame.state != GameState.PLAYING) return
+        if (!currentGame.players.contains(player)) return
+
+        val session = currentGame.currentTask ?: return
+        session.task as? FishTask ?: return
+
+        session.addProgress(
+            player = player,
+            amount = 1
         )
 
         player.playSound(

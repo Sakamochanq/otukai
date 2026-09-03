@@ -5,6 +5,7 @@ import com.Sakamochanq.otukai.task.kill.KillTask
 import com.Sakamochanq.otukai.task.use.UseItemTask
 import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
 import com.Sakamochanq.otukai.task.craft.CraftTask
+import com.Sakamochanq.otukai.task.fish.FishTask
 import com.Sakamochanq.otukai.task.use.UseType
 import org.bukkit.Material
 import kotlin.time.Duration.Companion.minutes
@@ -37,6 +38,11 @@ object TaskList {
             amount = 8,
             displayName = "棒",
             timeLimit = 5.minutes
-        )
+        ),
+        FishTask(
+            amount = 3,
+            displayName = "魚",
+            timeLimit = 7.minutes
+        ),
     )
 }
