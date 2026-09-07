@@ -161,6 +161,9 @@ class TaskSession(
             is com.Sakamochanq.otukai.task.fish.FishTask ->
                 task.amount
 
+            is com.Sakamochanq.otukai.task.location.LocationTask ->
+                1
+
             else -> 0
         }
     }

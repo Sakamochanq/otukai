@@ -26,12 +26,29 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.Sound
 import org.bukkit.Material
 
 class TaskProgressListener(
     private val plugin: OtukaiPlugin
 ) : Listener {
+
+    @EventHandler
+    fun onPlayerMove(event: PlayerMoveEvent) {
+        val from = event.from
+        val to = event.to
+
+        if (
+            from.blockX == to.blockX &&
+            from.blockY == to.blockY &&
+            from.blockZ == to.blockZ
+        ) {
+            return
+        }
+
+        plugin.gameManager.updateLocationProgress(event.player)
+    }
 
     // 釣りタスクの解禁条件を確認
     private fun checkFishingUnlock(player: Player) {

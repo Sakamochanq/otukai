@@ -8,6 +8,7 @@ import com.Sakamochanq.otukai.task.use.UseItemTask
 import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
 import com.Sakamochanq.otukai.task.fish.FishTask
 import com.Sakamochanq.otukai.task.craft.CraftTask
+import com.Sakamochanq.otukai.task.location.LocationTask
 import com.Sakamochanq.otukai.task.TaskDescriptionFormatter
 import com.Sakamochanq.otukai.ui.GameBossBar
 import com.Sakamochanq.otukai.ui.GameScoreboard
@@ -76,6 +77,7 @@ class GameManager {
 
         // 最初のタスクの初期インベントリを記録
         initializeItemTaskProgress(newGame)
+        updateLocationTaskProgress(newGame)
 
         bossBar.setPlayers(players)
         bossBar.update(newGame)
@@ -210,6 +212,43 @@ class GameManager {
         }
     }
 
+    private fun updateLocationTaskProgress(game: Game) {
+        if (game.state != GameState.PLAYING) {
+            return
+        }
+
+        val session = game.currentTask
+            ?: return
+
+        val task = session.task as? LocationTask
+            ?: return
+
+        game.players.forEach { player ->
+            if (
+                session.getProgress(player) == 0 &&
+                player.location.block.biome == task.biome
+            ) {
+                session.addProgress(player, 1)
+            }
+        }
+
+        showScoreboard(game)
+
+        if (session.isCompleted && game.checkTaskCompleted()) {
+            announceTaskCompleted()
+        }
+    }
+
+    fun updateLocationProgress(player: Player) {
+        val currentGame = game
+            ?: return
+
+        if (currentGame.state != GameState.PLAYING) return
+        if (!currentGame.players.contains(player)) return
+
+        updateLocationTaskProgress(currentGame)
+    }
+
     // キル系タスクの進捗を追加
     fun addKillProgress(player: Player) {
         val currentGame = game
@@ -255,6 +294,7 @@ class GameManager {
 
                 // アイテムタスクの進捗を更新
                 updateItemTaskProgress(currentGame)
+                updateLocationTaskProgress(currentGame)
 
                 // インターミッション終了後、
                 // 新しいタスクが開始された
@@ -266,6 +306,7 @@ class GameManager {
 
                     // 新しいタスクの初期インベントリを記録
                     initializeItemTaskProgress(currentGame)
+                    updateLocationTaskProgress(currentGame)
 
                     bossBar.update(currentGame)
                     bossBar.show()

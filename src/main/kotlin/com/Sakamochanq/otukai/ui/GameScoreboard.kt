@@ -8,6 +8,7 @@ import com.Sakamochanq.otukai.task.use.UseItemTask
 import com.Sakamochanq.otukai.task.breakblock.BreakBlockTask
 import com.Sakamochanq.otukai.task.craft.CraftTask
 import com.Sakamochanq.otukai.task.fish.FishTask
+import com.Sakamochanq.otukai.task.location.LocationTask
 import com.Sakamochanq.otukai.task.TaskDescriptionFormatter
 import org.bukkit.Bukkit
 import org.bukkit.scoreboard.DisplaySlot
@@ -72,6 +73,7 @@ class GameScoreboard {
             is BreakBlockTask -> "個"
             is CraftTask -> "個"
             is FishTask -> "匹"
+            is LocationTask -> "人"
             else -> ""
         }
 

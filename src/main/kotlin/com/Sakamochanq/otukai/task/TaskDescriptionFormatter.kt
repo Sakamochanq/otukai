@@ -6,6 +6,7 @@ import com.Sakamochanq.otukai.task.fish.FishTask
 import com.Sakamochanq.otukai.task.item.ItemTask
 import com.Sakamochanq.otukai.task.kill.KillTask
 import com.Sakamochanq.otukai.task.use.UseItemTask
+import com.Sakamochanq.otukai.task.location.LocationTask
 
 object TaskDescriptionFormatter {
 
@@ -20,6 +21,7 @@ object TaskDescriptionFormatter {
             is BreakBlockTask -> "${task.displayName}を${targetAmount}個壊そう！"
             is CraftTask -> "${task.displayName}を${targetAmount}個クラフトしよう！"
             is FishTask -> "${task.displayName}を${targetAmount}匹釣ろう！"
+            is LocationTask -> "${task.displayName}へ行こう！"
             else -> task.description
         }
     }
