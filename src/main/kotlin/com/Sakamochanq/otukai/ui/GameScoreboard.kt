@@ -30,7 +30,11 @@ class GameScoreboard {
     // 現在表示しているエントリー
     private val entries = mutableSetOf<String>()
 
-    fun show(game: Game) {
+    fun show(
+        game: Game,
+        currentScore: Int,
+        bestScore: Int
+    ) {
         val currentObjective = getOrCreateObjective()
 
         currentObjective.displaySlot = DisplaySlot.SIDEBAR
@@ -111,6 +115,10 @@ class GameScoreboard {
                 unit = unit
             )
         )
+
+        displayEntries.add("§0    ")
+        displayEntries.add("§bスコア: §f$currentScore")
+        displayEntries.add("§6ベストスコア: §f$bestScore")
 
         /*
          * スコアは表示順を決めるためだけに使用する。

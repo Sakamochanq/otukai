@@ -23,6 +23,7 @@ class GameManager {
     private val runnerTeam = RunnerTeam()
     private val bossBar = GameBossBar()
     private val scoreboard = GameScoreboard()
+    private val gameScore = GameScore()
 
     private var lastIntermissionSecond: Int? = null
     
@@ -32,6 +33,14 @@ class GameManager {
     val isRunning: Boolean
         get() = game?.state == GameState.PLAYING ||
                 game?.state == GameState.INTERMISSION
+
+    private fun showScoreboard(game: Game) {
+        scoreboard.show(
+            game = game,
+            currentScore = gameScore.currentScore,
+            bestScore = gameScore.bestScore
+        )
+    }
 
     fun getGame(): Game? {
         return game
@@ -62,6 +71,7 @@ class GameManager {
         newGame.start()
 
         game = newGame
+        gameScore.resetCurrentScore()
         lastIntermissionSecond = null
 
         // 最初のタスクの初期インベントリを記録
@@ -71,7 +81,7 @@ class GameManager {
         bossBar.update(newGame)
         bossBar.show()
 
-        scoreboard.show(newGame)
+        showScoreboard(newGame)
 
         announceTaskStarted(newGame)
 
@@ -192,7 +202,7 @@ class GameManager {
         }
 
         // Scoreboardを更新
-        scoreboard.show(game)
+        showScoreboard(game)
 
         // タスク達成
         if (session.isCompleted && game.checkTaskCompleted()) {
@@ -223,7 +233,7 @@ class GameManager {
         )
 
         // Scoreboardを更新
-        scoreboard.show(currentGame)
+        showScoreboard(currentGame)
 
         // タスク達成
         if (session.isCompleted && currentGame.checkTaskCompleted()) {
@@ -260,7 +270,7 @@ class GameManager {
                     bossBar.update(currentGame)
                     bossBar.show()
 
-                    scoreboard.show(currentGame)
+                    showScoreboard(currentGame)
 
                     announceTaskStarted(currentGame)
                 } else {
@@ -314,7 +324,7 @@ class GameManager {
             1.2f
         )
         
-        scoreboard.show(currentGame)
+        showScoreboard(currentGame)
         
         if (session.isCompleted && currentGame.checkTaskCompleted()) {
             announceTaskCompleted()
@@ -354,6 +364,12 @@ class GameManager {
 
     // おつかい完了
     private fun announceTaskCompleted() {
+        val currentGame = game
+            ?: return
+
+        gameScore.addScore()
+        showScoreboard(currentGame)
+
         Bukkit.getOnlinePlayers().forEach { player ->
             player.sendTitle(
                 "§a§lおつかい達成！",
@@ -424,6 +440,14 @@ class GameManager {
         lastIntermissionSecond = null
     }
 
+    fun onPlayerQuit(player: Player) {
+        if (game?.players?.contains(player) == true) {
+            stop()
+        }
+
+        gameScore.resetAll()
+    }
+
     // ブロック破壊系タスクの進捗を追加
     fun addBreakBlockProgress(player: Player) {
         val currentGame = game ?: return
@@ -445,7 +469,7 @@ class GameManager {
             1.2f
         )
 
-        scoreboard.show(currentGame)
+        showScoreboard(currentGame)
 
         if (session.isCompleted && currentGame.checkTaskCompleted()) {
             announceTaskCompleted()
@@ -476,7 +500,7 @@ class GameManager {
             1.2f
         )
 
-        scoreboard.show(currentGame)
+        showScoreboard(currentGame)
 
         if (session.isCompleted && currentGame.checkTaskCompleted()) {
             announceTaskCompleted()
@@ -505,10 +529,11 @@ class GameManager {
             1.2f
         )
 
-        scoreboard.show(currentGame)
+        showScoreboard(currentGame)
 
         if (session.isCompleted && currentGame.checkTaskCompleted()) {
             announceTaskCompleted()
         }
     }
+
 }

@@ -4,9 +4,12 @@ import com.Sakamochanq.otukai.command.OtukaiCommand
 import com.Sakamochanq.otukai.listener.TaskProgressListener
 import com.Sakamochanq.otukai.game.GameManager
 import com.Sakamochanq.otukai.game.GameScheduler
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
 
-class OtukaiPlugin : JavaPlugin() {
+class OtukaiPlugin : JavaPlugin(), Listener {
 
     lateinit var gameManager: GameManager
         private set
@@ -31,6 +34,7 @@ class OtukaiPlugin : JavaPlugin() {
             TaskProgressListener(this),
             this
         )
+        server.pluginManager.registerEvents(this, this)
         gameScheduler.start()
 
         logger.info("Otukai plugin enabled!")
@@ -46,5 +50,12 @@ class OtukaiPlugin : JavaPlugin() {
         }
 
         logger.info("Otukai plugin disabled!")
+    }
+
+    @EventHandler
+    fun onPlayerQuit(event: PlayerQuitEvent) {
+        if (::gameManager.isInitialized) {
+            gameManager.onPlayerQuit(event.player)
+        }
     }
 }
