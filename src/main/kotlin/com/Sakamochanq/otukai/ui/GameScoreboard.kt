@@ -117,8 +117,8 @@ class GameScoreboard {
         )
 
         displayEntries.add("§0    ")
-        displayEntries.add("§bスコア: §f$currentScore")
-        displayEntries.add("§6ベストスコア: §f$bestScore")
+        displayEntries.add("§bスコア §7: §f$currentScore")
+        displayEntries.add("§6ベストスコア §7: §f$bestScore")
 
         /*
          * スコアは表示順を決めるためだけに使用する。
@@ -183,7 +183,7 @@ class GameScoreboard {
         progress: Int,
         unit: String
     ): String {
-        return "§f$playerName §7| §a${progress}${unit}"
+        return "§f$playerName §7: §a${progress}${unit}"
     }
 
     private fun createTotalEntry(
@@ -191,7 +191,7 @@ class GameScoreboard {
         target: Int,
         unit: String
     ): String {
-        return "§e合計 §7| §a${progress}/${target}${unit}"
+        return "§e合計 §7: §a${progress}/${target}${unit}"
     }
 
     private fun clear() {
