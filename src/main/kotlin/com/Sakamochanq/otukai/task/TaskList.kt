@@ -15,10 +15,5 @@ import org.bukkit.entity.EntityType
 object TaskList {
 
     val tasks: List<Task> = listOf(
-        LocationTask(
-            biome = org.bukkit.block.Biome.DESERT,
-            displayName = "砂漠バイオーム",
-            timeLimit = 30.minutes
-        ),
     )
 }

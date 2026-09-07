@@ -3,6 +3,7 @@ package com.Sakamochanq.otukai.game
 import com.Sakamochanq.otukai.task.Task
 import com.Sakamochanq.otukai.task.TaskSession
 import com.Sakamochanq.otukai.task.fish.FishTask
+import com.Sakamochanq.otukai.task.kill.KillTask
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -128,11 +129,24 @@ class Game(
                 continue
             }
 
+            // 敵対MOBのキルタスクは夜間のみ解禁する
+            if (task is KillTask && task.requiresNight && !isNight()) {
+                currentTaskIndex++
+                continue
+            }
+
             currentTask = TaskSession(task, players.size)
             return
         }
 
         finish()
+    }
+
+    private fun isNight(): Boolean {
+        return players.all { player ->
+            val time = player.world.time % 24_000L
+            time in 13_000L until 23_000L
+        }
     }
 
     private fun startIntermission() {
