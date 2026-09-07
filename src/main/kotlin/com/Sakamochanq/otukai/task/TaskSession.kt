@@ -21,6 +21,11 @@ class TaskSession(
     val targetAmount: Int
         get() {
             val baseAmount = getBaseAmount()
+
+            if (task is com.Sakamochanq.otukai.task.location.LocationTask) {
+                return baseAmount
+            }
+
             return baseAmount * playerCount
         }
 
