@@ -15,6 +15,8 @@ import com.Sakamochanq.otukai.ui.GameScoreboard
 import org.bukkit.Bukkit
 import org.bukkit.Sound
 import org.bukkit.entity.Player
+import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scheduler.BukkitTask
 import kotlin.time.Duration
 
 class GameManager {
@@ -27,13 +29,15 @@ class GameManager {
     private val gameScore = GameScore()
 
     private var lastIntermissionSecond: Int? = null
+    private var startCountdownTask: BukkitTask? = null
     
     // クラフト前の対象アイテム数
     private val craftInitialCounts: MutableMap<Player, Int> = mutableMapOf()
 
     val isRunning: Boolean
         get() = game?.state == GameState.PLAYING ||
-                game?.state == GameState.INTERMISSION
+                game?.state == GameState.INTERMISSION ||
+                startCountdownTask != null
 
     private fun showScoreboard(game: Game) {
         scoreboard.show(
@@ -52,9 +56,71 @@ class GameManager {
             return false
         }
 
-        runnerTeam.clear()
+        val players = Bukkit.getOnlinePlayers().toSet()
+
+        if (players.isEmpty()) {
+            return false
+        }
+
+        return startGame(players)
+    }
+
+    fun startCountdown(plugin: JavaPlugin): Boolean {
+        if (isRunning) {
+            return false
+        }
 
         val players = Bukkit.getOnlinePlayers().toSet()
+
+        if (players.isEmpty()) {
+            return false
+        }
+
+        var remainingSeconds = 10
+
+        players.forEach { player ->
+            player.sendTitle(
+                "§e§lゲーム開始まで",
+                "§f$remainingSeconds",
+                0,
+                20,
+                0
+            )
+        }
+
+        startCountdownTask = plugin.server.scheduler.runTaskTimer(
+            plugin,
+            Runnable {
+                remainingSeconds--
+
+                if (remainingSeconds <= 0) {
+                    startCountdownTask?.cancel()
+                    startCountdownTask = null
+                    startGame(players)
+                    return@Runnable
+                }
+
+                players.forEach { player ->
+                    if (player.isOnline) {
+                        player.sendTitle(
+                            "§e§lゲーム開始まで",
+                            "§f$remainingSeconds",
+                            0,
+                            20,
+                            0
+                        )
+                    }
+                }
+            },
+            20L,
+            20L
+        )
+
+        return true
+    }
+
+    private fun startGame(players: Set<Player>): Boolean {
+        runnerTeam.clear()
 
         if (players.isEmpty()) {
             return false
@@ -75,7 +141,6 @@ class GameManager {
         gameScore.resetCurrentScore()
         lastIntermissionSecond = null
 
-        // 最初のタスクの初期インベントリを記録
         initializeItemTaskProgress(newGame)
         updateLocationTaskProgress(newGame)
 
@@ -84,7 +149,6 @@ class GameManager {
         bossBar.show()
 
         showScoreboard(newGame)
-
         announceTaskStarted(newGame)
 
         return true
@@ -94,6 +158,9 @@ class GameManager {
         if (!isRunning) {
             return false
         }
+
+        startCountdownTask?.cancel()
+        startCountdownTask = null
 
         game?.stop()
 

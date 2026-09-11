@@ -25,8 +25,8 @@ class OtukaiCommand(
 
         when (args[0].lowercase()) {
             "start" -> {
-                if (plugin.gameManager.start()) {
-                    sender.sendMessage("§a§l[おつかい] §aゲームを開始しました！")
+                if (plugin.gameManager.startCountdown(plugin)) {
+                    sender.sendMessage("§a§l[おつかい] §a10秒後にゲームを開始します！")
                 } else {
                     sender.sendMessage("§a§l[おつかい] §cすでにゲームが実行中です。")
                 }
