@@ -73,6 +73,41 @@ Minecraft 1.21.10 Paper/Spigot
 <br>
 <br>
 
+### 環境構築
+
+1. Dockerをインストールする.
+
+<br>
+
+2. Docker imageのビルド.
+
+    ```bash
+    docker build -t otukai .
+    ```
+
+<br>
+
+3. プロジェクトのビルド
+
+    ```bash
+    ./gradlew build
+    ```
+
+<br>
+
+4. Dockerサーバーの起動
+
+    ```bash
+    docker compose start minecraft
+    ```
+
+<br>
+
+5. Minecraftクライアントを起動し、`localhost` に接続する。
+
+<br>
+<br>
+
 ### 追記
 
 コーディング補助として **Github Copilot** を使用しています。  
