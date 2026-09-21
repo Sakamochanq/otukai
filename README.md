@@ -6,18 +6,17 @@
 <br>
 
 ### 概要
-サバイバルをテーマに制限時間内に様々なタスクをクリアしていくミニゲームです。  
-プレイ人数に応じて、変数が乗算されていく仕組みなので、人数が多いほど難易度が上がります。  
-全体の難易度としては、**初心者～中級者** 向けとなっています。  
-時間切れになるまでゲームは続きます。`/otukai stop`で終了できます。ベストスコアを目指してみよう。
+サバイバルをテーマに制限時間内に様々なタスクをクリアしていくミニゲームです。  プレイ人数に応じて、変数が乗算されていく仕組みなので、人数に合わせた難易度になります。 全体の難易度としては、**初心者～中級者** 向けに設定しており、[`TaskList.kt`](https://github.com/Sakamochanq/otukai/blob/master/src/main/kotlin/com/Sakamochanq/otukai/task/TaskList.kt)を編集することで、自分なりのタスクを作成することが出来ます。普通のサバイバルに少し飽きたので作ってみました。多少の競技性をもたせるために、スコア/ベストスコア システムを設けてみました。マルチプレイの場合は、協力プレイになります。対戦モードなどは実装していません。ソースコードとDockerfileを公開するので、自由に作成/コンパイルしてみて下さい。
 
 <br>
-
-#### コマンド
 
 <div>
   <table>
     <tbody>
+      <tr>
+        <td>コマンド</td>
+        <td>内容</td>
+      </tr>
       <tr>
         <td>/otukai start</td>
         <td>ゲーム開始</td>
@@ -39,6 +38,12 @@
   <table>
     <thead>
       <tr>
+        <th>Fig.1</th>
+        <th>Fig.2</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
         <th>
             <img src="./.github/screenie/1.png" width="400"/>
         </th>
@@ -46,8 +51,6 @@
             <img src="./.github/screenie/2.png" width="400"/>
         </th>
       </tr>
-    </thead>
-    <tbody>
       <tr>
         <td>
           <img src="./.github/screenie/3.png" width="400"/>
